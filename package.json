@@ -1,0 +1,26 @@
+{
+  "name": "csv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Diamur/csv.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Diamur/csv/issues"
+  },
+  "homepage": "https://github.com/Diamur/csv#readme",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-reader": "^1.0.11",
+    "fast-csv": "^4.3.6",
+    "grunt": "^1.6.1",
+    "mysql": "^2.18.1"
+  }
+}
