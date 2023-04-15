@@ -8,6 +8,7 @@ var fileNameParse = "";
 var fileNameOUT = "";
 var map =  new Map();
 var arrNewHeaders = [];
+var arrHeaders = [];
 
 //---------------FUN--------------------------------------------------------------
 //-------------- ПРОВЕРКА ВХОДНЫХ ДАННЫХ
@@ -31,6 +32,58 @@ function isInputVal(){
       return true;
 };
 //-------------------------------------------------------------------------------
+//-------------- запись в map
+//-------------------------------------------------------------------------------
+async function setMap(filename,key){
+    return new Promise((resolve, reject) => {
+        
+   
+    var num = 0; 
+    fs.createReadStream(filename,"utf-8") 
+    .pipe(csv({ separator: ';' })) 
+    .on('headers', (headers) => { 
+        arrHeaders =   headers;
+            console.log(`Headers:`, headers) ;
+    })
+    .on('data', (row) => { 
+      num++;
+      if(num < 3)
+       console.log  ( row[key] ); 
+    //  console.log  ( row.IE_ID , row.IE_NAME ); 
+    //  console.log  (num, arrHeaders[0]+":"+row[arrHeaders[0]] , arrHeaders[1]+":"+row[arrHeaders[1]] ); 
+    //---------------------------
+    // ОБРАБОТКА СТРОК 
+    //---------------------------
+    // Запись в map
+
+     const obj = {};
+     arrHeaders.forEach(h=>{
+        obj[h] = row[h];
+     })
+    //  obj[arrHeaders[0]] =  row[arrHeaders[0]];
+
+    //  map.set(row[arrHeaders[0]],
+     map.set(row[key],
+     obj
+        // {
+        // Name:row[arrHeaders[0]],
+        // NameID:row[arrHeaders[1]]
+        // }
+        )
+}) 
+.on('end', () => { 
+    console.log('CSV file successfully processed'); 
+    console.log(num);    
+    console.log(map.get(`Автоматический выключатель DPX3 250 - термомагнитный расцепитель 25 кА 400 В  3П 200 А | 420208 Legrand`));    
+    console.log(map.get(`ВБШвнг(А)-FRLSLTx 4х240`));    
+   
+    resolve(true);
+
+    }); 
+
+ })  
+};
+//-------------------------------------------------------------------------------
 //-------------- ЧТЕНИЕ ИЗ CSV
 //-------------------------------------------------------------------------------
 function readFileCSV(filename){
@@ -38,13 +91,12 @@ function readFileCSV(filename){
     fs.createReadStream(filename,"utf-8") 
     .pipe(csv({ separator: ';' })) 
     .on('headers', (headers) => {   
-    
-        console.log(`Headers:`, headers) ;
+            console.log(`Headers:`, headers) ;
         // Назначение/преобразования новых заголовков для нового файла
         headers.forEach((s,i)=>{
             if(i==5){
-                arrNewHeaders.push({id:'name_id',title:'name_id'});
                 arrNewHeaders.push({id:s,title:s});
+                arrNewHeaders.push({id:'name_id',title:'name_id'});
             }else{
                 arrNewHeaders.push({id:s,title:s});
             }
@@ -52,14 +104,19 @@ function readFileCSV(filename){
     })
     .on('data', (row) => { 
       num++;
-    //   if(num <100)
-    //  console.log  ( row ); 
+      if(num <100)
+     console.log  ( row ); 
     //  console.log  ( row.IE_ID , row.IE_NAME ); 
-    }) 
-    .on('end', () => { 
+    //---------------------------
+    // ОБРАБОТКА СТРОК 
+    //---------------------------
+    // Запись в map
+
+}) 
+.on('end', () => { 
     console.log('CSV file successfully processed'); 
     console.log(arrNewHeaders);
-    
+    console.log(num);    
     }); 
 };
 
@@ -99,14 +156,15 @@ function writeFileCSV(filename){
     };  
 };
 
-//-------------------------------------------------------------------------------
-//-------------- РЕАЛИЗАЦИЯ 
-//-------------------------------------------------------------------------------
-// Проверка входных данных
+async function start(){
+
+     // Проверка входных данных
 if(!isInputVal()) return;
 
 // Прочитать NAME ID csv
-readFileCSV(fileNameParse);
+// readFileCSV(fileNameParse);
+await setMap( fileNameVPR,"IE_NAME");
+await setMap( fileNameParse,"name");
 
 // Записать данные в MAP по ключу НАИМЕНОВАНИЯ
 
@@ -115,3 +173,11 @@ readFileCSV(fileNameParse);
 // ЗАПИСАТЬ
 
 //writeCSV();
+// console.log(map);
+
+};
+//-------------------------------------------------------------------------------
+//-------------- РЕАЛИЗАЦИЯ 
+//-------------------------------------------------------------------------------
+
+start();
