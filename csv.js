@@ -7,6 +7,7 @@ var fileNameVPR = "";
 var fileNameParse = "";
 var fileNameOUT = "";
 var map =  new Map();
+var arrNewHeaders = [];
 
 //---------------FUN--------------------------------------------------------------
 //-------------- ПРОВЕРКА ВХОДНЫХ ДАННЫХ
@@ -36,24 +37,38 @@ function readFileCSV(filename){
     var num = 0; 
     fs.createReadStream(filename,"utf-8") 
     .pipe(csv({ separator: ';' })) 
-    .on('headers', (headers) => {   console.log(`Headers:`, headers) })
+    .on('headers', (headers) => {   
+    
+        console.log(`Headers:`, headers) ;
+        // Назначение/преобразования новых заголовков для нового файла
+        headers.forEach((s,i)=>{
+            if(i==5){
+                arrNewHeaders.push({id:'name_id',title:'name_id'});
+                arrNewHeaders.push({id:s,title:s});
+            }else{
+                arrNewHeaders.push({id:s,title:s});
+            }
+        })
+    })
     .on('data', (row) => { 
       num++;
-      if(num <100)
-     console.log  ( row ); 
+    //   if(num <100)
+    //  console.log  ( row ); 
     //  console.log  ( row.IE_ID , row.IE_NAME ); 
     }) 
     .on('end', () => { 
     console.log('CSV file successfully processed'); 
+    console.log(arrNewHeaders);
+    
     }); 
 };
 
 //-------------------------------------------------------------------------------
 //-------------- ЗАПИСЬ В CSV
 //-------------------------------------------------------------------------------
-function writeFileCSV(){
+function writeFileCSV(filename){
     const csvWriter = createCsvWriter({
-        path: 'file.csv',
+        path: filename,
         header: [
             {id: 'name', title: 'NAME'},
             {id: 'lang', title: 'LANGUAGE'}
@@ -87,8 +102,6 @@ function writeFileCSV(){
 //-------------------------------------------------------------------------------
 //-------------- РЕАЛИЗАЦИЯ 
 //-------------------------------------------------------------------------------
-//-1
-//-2
 // Проверка входных данных
 if(!isInputVal()) return;
 
