@@ -50,7 +50,6 @@ function getSubFilePath(dir, path){
             subdir = el+'\\';
           }
         });
-
         return {dir:dir + subdir, filename:fname } ;
 }
 
