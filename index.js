@@ -31,10 +31,13 @@ if(filename== "") {
 var num = 0; 
 fs.createReadStream(filecsv,"utf-8") 
 .pipe(csv({ separator: ';' })) 
+.on('headers', (headers) => {   console.log(`Headers:`, headers) })
 .on('data', (row) => { 
   num++;
   if(num <100)
-console.log  ( row.IE_ID , row.IE_NAME ); 
+ console.log  ( row.IE_ID , row.IE_NAME ); 
+ 
+// console.log  ( row); 
 }) 
 .on('end', () => { 
 console.log('CSV file successfully processed'); 
