@@ -9,6 +9,7 @@ var fileNameOUT = "";
 var map =  new Map();
 var arrNewHeaders = [];
 var arrHeaders = [];
+var arrUrls = [];
 
 //---------------FUN--------------------------------------------------------------
 //-------------- ПРОВЕРКА ВХОДНЫХ ДАННЫХ
@@ -31,13 +32,22 @@ function isInputVal(){
       }
       return true;
 };
+
+//-------------------------------------------------------------------------------
+//-------------- Прочитать и занести в массив список файлов csv
+//-------------------------------------------------------------------------------
+
+function getArrStrFromFile(filename){
+    var txt = fs.readFileSync( filename , {encoding:'utf8', flag:'r'} );
+    return txt.split('\r\n');
+ }
+
 //-------------------------------------------------------------------------------
 //-------------- запись в map
 //-------------------------------------------------------------------------------
-async function setMap(filename,key){
+
+async function setMap(filename,key, catalog){
     return new Promise((resolve, reject) => {
-        
-   
     var num = 0; 
     fs.createReadStream(filename,"utf-8") 
     .pipe(csv({ separator: ';' })) 
@@ -48,37 +58,66 @@ async function setMap(filename,key){
     .on('data', (row) => { 
       num++;
       if(num < 3)
-       console.log  ( row[key] ); 
+    //    console.log  ( row[key] ); 
+       console.log(' row.pic1: ' ,  row.pic1 );
     //  console.log  ( row.IE_ID , row.IE_NAME ); 
-    //  console.log  (num, arrHeaders[0]+":"+row[arrHeaders[0]] , arrHeaders[1]+":"+row[arrHeaders[1]] ); 
     //---------------------------
     // ОБРАБОТКА СТРОК 
     //---------------------------
     // Запись в map
 
-     const obj = {};
-     arrHeaders.forEach(h=>{
-        obj[h] = row[h];
-     })
-    //  obj[arrHeaders[0]] =  row[arrHeaders[0]];
+     var obj = {};
+    // Если НЕ fileNameVPR 
+     if(filename.indexOf('ID') == -1){
+        obj = map.get( row.name) ;
+        if(num < 3){
+            console.log('map.get( row.name): ' , map.get( row.name) );
+            console.log('obj: ' , obj );
+        }
+     }
+    // Добавляем значения КОЛОНОК
+    arrHeaders.forEach(h=>{
+    //Если нашлось в ВПР позиция  
+    if(obj) {
+    //Добавляем ПОЛЯ
+        if(h=='cat5'){
+            obj[h] = row[h];   
+            obj['SUBDIR'] = catalog;   
+        }
+        if(h=='pic1'){
+            obj[h] = row[h];   
+            obj['pic'] = 'vk_' + row[h].replace('1000x1000w','400x200').replace('https://e-kc.ru/files/products/','');   
+            //.jpg  image/jpeg
+            //.jpeg image/jpeg
+            //.png  image/png
+            //.gif  image/gif
+            obj['CONTENT_TYPE'] =  obj['pic'].indexOf('.jpg') != -1 ? 'image/jpeg' :  
+                                    ( obj['pic'].indexOf('.jpeg') != -1  ? 'image/jpeg' :  
+                                       ( obj['pic'].indexOf('.png') != -1 ? 'image/png' : 
+                                          (obj['pic'].indexOf('.gif') != -1 ? 'image/gif' : 'image/jpeg')  )  )  ; 
 
-    //  map.set(row[arrHeaders[0]],
-     map.set(row[key],
-     obj
-        // {
-        // Name:row[arrHeaders[0]],
-        // NameID:row[arrHeaders[1]]
-        // }
-        )
+            obj['PATH'] = '/upload/' + catalog + '/' + obj['pic'];   
+        }
+        if(h=='price'){
+            obj[h] = row[h];   
+            obj['count'] = 100;   
+        }
+        else{
+            obj[h] = row[h];   
+            }
+        }  
+    })
+
+     if(num == 782  || num == 781){
+        console.log('obj: ' , obj );
+    }
+    if(obj)   map.set(row[key], obj )
 }) 
 .on('end', () => { 
-    console.log('CSV file successfully processed'); 
+    console.log('catalog: ' , catalog );
+    console.log('CSV '+ filename +' file successfully processed'); 
     console.log(num);    
-    console.log(map.get(`Автоматический выключатель DPX3 250 - термомагнитный расцепитель 25 кА 400 В  3П 200 А | 420208 Legrand`));    
-    console.log(map.get(`ВБШвнг(А)-FRLSLTx 4х240`));    
-   
     resolve(true);
-
     }); 
 
  })  
@@ -156,26 +195,31 @@ function writeFileCSV(filename){
     };  
 };
 
+//-------------------------------------------------------------------------------
+//-------------- START
+//-------------------------------------------------------------------------------
 async function start(){
-
-     // Проверка входных данных
+// Проверка входных данных
 if(!isInputVal()) return;
 
 // Прочитать NAME ID csv
-// readFileCSV(fileNameParse);
 await setMap( fileNameVPR,"IE_NAME");
-await setMap( fileNameParse,"name");
 
-// Записать данные в MAP по ключу НАИМЕНОВАНИЯ
+arrUrls = getArrStrFromFile('data/urls.txt');
+    for (const file of arrUrls) {
+    // Записать данные в MAP по ключу НАИМЕНОВАНИЯ
+      await setMap( file.split(',')[0],"name",file.split(',')[1].replaceAll(' ',''));
+    }
+
+    console.log(map.get(`Автоматический выключатель DPX3 250 - термомагнитный расцепитель 25 кА 400 В  3П 200 А | 420208 Legrand`));    
+    console.log('Done!');
 
 // Прочитать 01_01
 // Добавить поле ID после NAME
 // ЗАПИСАТЬ
 
-//writeCSV();
-// console.log(map);
-
 };
+
 //-------------------------------------------------------------------------------
 //-------------- РЕАЛИЗАЦИЯ 
 //-------------------------------------------------------------------------------

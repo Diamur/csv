@@ -1,0 +1,9 @@
+n:\!!TRUE-IT\csv\eks\Залив0\04_01.csv,catalog_1_1
+n:\!!TRUE-IT\csv\eks\Залив0\03_03.csv,catalog_3_3
+n:\!!TRUE-IT\csv\eks\Залив0\03_02.csv,catalog_3_2
+n:\!!TRUE-IT\csv\eks\Залив0\03_01.csv,catalog_3_1
+n:\!!TRUE-IT\csv\eks\Залив0\02_02.csv,catalog_2_2
+n:\!!TRUE-IT\csv\eks\Залив0\02_01.csv,catalog_2_1
+n:\!!TRUE-IT\csv\eks\Залив0\01_03.csv,catalog_1_3
+n:\!!TRUE-IT\csv\eks\Залив0\01_02.csv,catalog_1_2
+n:\!!TRUE-IT\csv\eks\Залив0\01_01.csv,catalog_1_1
