@@ -56,7 +56,7 @@ async function setMap(filename,key, catalog){
             console.log(`Headers:`, headers) ;
     })
     .on('data', (row) => { 
-      num++;
+    
       if(num < 3)
     //    console.log  ( row[key] ); 
        console.log(' row.pic1: ' ,  row.pic1 );
@@ -108,10 +108,14 @@ async function setMap(filename,key, catalog){
         }  
     })
 
-     if(num == 782  || num == 781){
-        console.log('obj: ' , obj );
-    }
-    if(obj)   map.set(row[key], obj )
+   if(obj){
+        if(num == 0){
+          arrNewHeaders = Object.keys(obj);
+          console.log('arrNewHeaders: ' , arrNewHeaders );
+        }
+        map.set(row[key], obj );
+    }   
+    num++;
 }) 
 .on('end', () => { 
     console.log('catalog: ' , catalog );
@@ -162,7 +166,15 @@ function readFileCSV(filename){
 //-------------------------------------------------------------------------------
 //-------------- ЗАПИСЬ В CSV
 //-------------------------------------------------------------------------------
-function writeFileCSV(filename){
+async function writeFileCSV(filename){
+
+
+    arrNewHeaders.forEach(h=>{
+
+        
+
+    })
+
     const csvWriter = createCsvWriter({
         path: filename,
         header: [
@@ -217,6 +229,12 @@ arrUrls = getArrStrFromFile('data/urls.txt');
 // Прочитать 01_01
 // Добавить поле ID после NAME
 // ЗАПИСАТЬ
+
+  map.forEach((value, key, map) => {
+    // Prints "greeting Hello" followed by "name John"
+    // console.log(value, key);
+  });
+
 
 };
 
