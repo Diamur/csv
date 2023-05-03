@@ -1,0 +1,158 @@
+const mysql = require('mysql');
+const fs  = require('fs');
+const wget = require('node-wget');
+const profile = require("./data/mysql_profile.js")  
+//---------------------------------------------------------------
+var sqlquery = `SELECT 
+b_file.ID  AS b_file_ID ,
+b_iblock_element.ID  AS b_iblock_element_ID ,
+b_iblock_element.NAME  ,
+b_iblock_element.DETAIL_PICTURE ,
+b_file.SUBDIR ,
+b_file.FILE_NAME ,
+b_file.ORIGINAL_NAME  
+FROM  b_iblock_element  
+INNER JOIN  b_file  ON  b_file.ID  =  b_iblock_element.DETAIL_PICTURE 
+WHERE  b_iblock_element.IBLOCK_ID  =26 
+GROUP BY  b_file.FILE_NAME
+`;
+
+// const db_data =  "vangre_002";
+const db_data =  "vkcable_db7";
+const domen = "https://bericabel.ru/upload/";
+const dir = "H:/!_wget/bericabel.ru/in/";
+var dist = "";
+var url = "";
+var comanda = "";
+
+console.log('profile: ' , profile.data(db_data) );
+
+//-------------------------------FUNCTIONS -----------------
+async function getQuery(db,query){
+return new Promise((resolve, reject) => {
+    var connection = mysql.createConnection(profile.data(db));
+    connection.connect();
+    connection.query( query, function (error, results, fields) {
+    if (error) throw error;
+       resolve(results);
+    });    
+    connection.end();
+  })
+}
+
+async function getWget(url,dist){
+return new Promise((resolve, reject) => {
+    wget({
+        url:  url,
+        dest: dist,      // destination path or path with filenname, default is ./
+        timeout: 4000       // duration to wait for request fulfillment in milliseconds, default is 2 seconds
+    },
+    function (error, response, body) {
+            if (error) {
+                console.log('--- error:');
+                console.log(error);            // error encountered
+                reject(false)
+            } else {
+                console.log('--- headers:');
+                console.log(response.headers); // response headers
+            // console.log('--- body:');
+            // console.log(body);             // content of package
+            resolve(true);
+            }
+        }
+    );
+  })
+}
+
+async function run(){
+
+    // Получение результата
+ var array = await getQuery(db_data , sqlquery );
+ console.log(array);
+  
+ for (const element of array) {
+
+    const dist = dir + element.SUBDIR + '/';
+    const url = domen + element.SUBDIR + '/' + element.FILE_NAME ;
+
+    //Проверки существовании папки, если нет создаем
+    if (!fs.existsSync(dist)){
+        console.log( dist , " не существует...создаем" );
+        fs.mkdirSync(dist);
+    }else{
+         console.log( dist , " существует" );
+    }
+
+    await getWget(url,dist);
+  }
+  console.log('Done!');
+
+}
+
+
+//-------------------------------РЕАЛИЗАЦИЯ -----------------
+run();
+
+   
+return;
+
+
+
+var connection = mysql.createConnection(profile.data(db_data));
+connection.connect();
+connection.query( sqlquery, function (error, results, fields) {
+if (error) throw error;
+if(results){
+    /*
+    // console.log('The fields is: ', fields);
+    // console.log('The results is: ', results);
+    // console.log('The results is: ', results[0].NAME);
+    */
+     console.log('The results is: ', results[0]);
+    results.forEach( (element,i) => {
+        // if(i<10)
+        if( element.SUBDIR  == "iblock/0a0" )
+        {
+            
+            dist = dir + element.SUBDIR + '/';
+            url = domen + element.SUBDIR + '/' + element.FILE_NAME ;
+             
+        //    console.log(i, 'NAME: ' , element.NAME );
+        //    console.log(i, 'SUBDIR: ' , element.SUBDIR );
+        //    console.log(i, 'dist: ' , dist);
+        //    console.log(i, 'url: ' , url);
+
+//Проверки существовании папки, если нет создаем
+if (!fs.existsSync(dist)){
+     fs.mkdirSync(dist);
+    console.log(i, dist , " не существует" );
+}else{
+    console.log( i, dist , " существует" );
+
+}
+
+/*
+           wget({
+            url:  url,
+            dest: dist,      // destination path or path with filenname, default is ./
+            timeout: 4000       // duration to wait for request fulfillment in milliseconds, default is 2 seconds
+        },
+        function (error, response, body) {
+            if (error) {
+                console.log('--- error:');
+                console.log(error);            // error encountered
+            } else {
+                console.log('--- headers:');
+                console.log(response.headers); // response headers
+                // console.log('--- body:');
+                // console.log(body);             // content of package
+            }
+        }
+    );
+*/
+
+        }
+    });
+}
+});     
+connection.end();
