@@ -16,7 +16,6 @@ INNER JOIN  b_file  ON  b_file.ID  =  b_iblock_element.DETAIL_PICTURE
 WHERE  b_iblock_element.IBLOCK_ID  =26 
 GROUP BY  b_file.FILE_NAME
 `;
-
 // const db_data =  "vangre_002";
 const db_data =  "vkcable_db7";
 const domen = "https://bericabel.ru/upload/";
@@ -91,7 +90,6 @@ async function run(){
 
 //-------------------------------РЕАЛИЗАЦИЯ -----------------
 run();
-
-   
+  
 return;
 
