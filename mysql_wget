@@ -20,9 +20,6 @@ GROUP BY  b_file.FILE_NAME
 const db_data =  "vkcable_db7";
 const domen = "https://bericabel.ru/upload/";
 const dir = "H:/!_wget/bericabel.ru/in/";
-var dist = "";
-var url = "";
-var comanda = "";
 
 console.log('profile: ' , profile.data(db_data) );
 
