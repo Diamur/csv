@@ -89,70 +89,9 @@ async function run(){
 
 }
 
-
 //-------------------------------РЕАЛИЗАЦИЯ -----------------
 run();
 
    
 return;
 
-
-
-var connection = mysql.createConnection(profile.data(db_data));
-connection.connect();
-connection.query( sqlquery, function (error, results, fields) {
-if (error) throw error;
-if(results){
-    /*
-    // console.log('The fields is: ', fields);
-    // console.log('The results is: ', results);
-    // console.log('The results is: ', results[0].NAME);
-    */
-     console.log('The results is: ', results[0]);
-    results.forEach( (element,i) => {
-        // if(i<10)
-        if( element.SUBDIR  == "iblock/0a0" )
-        {
-            
-            dist = dir + element.SUBDIR + '/';
-            url = domen + element.SUBDIR + '/' + element.FILE_NAME ;
-             
-        //    console.log(i, 'NAME: ' , element.NAME );
-        //    console.log(i, 'SUBDIR: ' , element.SUBDIR );
-        //    console.log(i, 'dist: ' , dist);
-        //    console.log(i, 'url: ' , url);
-
-//Проверки существовании папки, если нет создаем
-if (!fs.existsSync(dist)){
-     fs.mkdirSync(dist);
-    console.log(i, dist , " не существует" );
-}else{
-    console.log( i, dist , " существует" );
-
-}
-
-/*
-           wget({
-            url:  url,
-            dest: dist,      // destination path or path with filenname, default is ./
-            timeout: 4000       // duration to wait for request fulfillment in milliseconds, default is 2 seconds
-        },
-        function (error, response, body) {
-            if (error) {
-                console.log('--- error:');
-                console.log(error);            // error encountered
-            } else {
-                console.log('--- headers:');
-                console.log(response.headers); // response headers
-                // console.log('--- body:');
-                // console.log(body);             // content of package
-            }
-        }
-    );
-*/
-
-        }
-    });
-}
-});     
-connection.end();
