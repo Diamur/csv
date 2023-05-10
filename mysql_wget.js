@@ -2,31 +2,21 @@ const mysql = require('mysql');
 const fs  = require('fs');
 const wget = require('node-wget');
 const profile = require("./data/mysql_profile.js")  
+const query = require("./data/query.js")  
 //---------------------------------------------------------------
-var sqlquery = `SELECT 
-b_file.ID  AS b_file_ID ,
-b_iblock_element.ID  AS b_iblock_element_ID ,
-b_iblock_element.NAME  ,
-b_iblock_element.DETAIL_PICTURE ,
-b_file.SUBDIR ,
-b_file.FILE_NAME ,
-b_file.ORIGINAL_NAME  
-FROM  b_iblock_element  
-INNER JOIN  b_file  ON  b_file.ID  =  b_iblock_element.DETAIL_PICTURE 
-WHERE  b_iblock_element.IBLOCK_ID  =26 
-GROUP BY  b_file.FILE_NAME
-`;
-// const db_data =  "vangre_002";
-const db_data =  "vkcable_db7";
-const domen = "https://bericabel.ru/upload/";
-const dir = "H:/!_wget/bericabel.ru/in/";
-
-console.log('profile: ' , profile.data(db_data) );
+const domen     = "allcabletorg.ru";
+const upload    = "https://" + domen +"/upload/";
+const dir0      = "H:/!_wget/" + domen ;
+const dir1      = "H:/!_wget/" + domen +"/in/";
+const dir2      = "H:/!_wget/" + domen +"/in/iblock";
+const dir       = "H:/!_wget/" + domen +"/in/";
+const db_data   =  profile[domen];
+const query_b_file = query.b_file(26);
 
 //-------------------------------FUNCTIONS -----------------
-async function getQuery(db,query){
+async function getQuery(query){
 return new Promise((resolve, reject) => {
-    var connection = mysql.createConnection(profile.data(db));
+    var connection = mysql.createConnection(db_data);
     connection.connect();
     connection.query( query, function (error, results, fields) {
     if (error) throw error;
@@ -61,30 +51,30 @@ return new Promise((resolve, reject) => {
 }
 
 async function run(){
-
-    // Получение результата
- var array = await getQuery(db_data , sqlquery );
+// console.log('db_data: ' , db_data );
+// console.log('query_b_file: ' , query_b_file );
+// Создаем папки
+if (!fs.existsSync(dir0)) fs.mkdirSync(dir0);
+if (!fs.existsSync(dir1)) fs.mkdirSync(dir1);
+if (!fs.existsSync(dir2)) fs.mkdirSync(dir2);
+// Получение результата
+ var array = await getQuery(query_b_file );
  console.log(array);
-  
+
  for (const element of array) {
-
     const dist = dir + element.SUBDIR + '/';
-    const url = domen + element.SUBDIR + '/' + element.FILE_NAME ;
-
+    const url = upload + element.SUBDIR + '/' + element.FILE_NAME ;
     //Проверки существовании папки, если нет создаем
     if (!fs.existsSync(dist)){
-        console.log( dist , " не существует...создаем" );
+            console.log( dist , " не существует...создаем" );
         fs.mkdirSync(dist);
     }else{
-         console.log( dist , " существует" );
+            console.log( dist , " существует" );
     }
-
     await getWget(url,dist);
   }
   console.log('Done!');
-
 }
-
 //-------------------------------РЕАЛИЗАЦИЯ -----------------
 run();
   
