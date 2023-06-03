@@ -48,10 +48,15 @@ module.exports = {
                             password : 'W4wxb9WqZ5XD',
                             database : 'vkcable_db1' },
                             
-    "allcabletorg.ru"  : {  host     : 'vkcable.beget.tech',
-                            user     : 'vkcable_db2',
-                            password : 'W4wxb9WqZ5XD',
-                            database : 'vkcable_db2' },
+    "allcabletorg.ru"       : { host     : 'vkcable.beget.tech',
+                                user     : 'vkcable_db2',
+                                password : 'W4wxb9WqZ5XD',
+                                database : 'vkcable_db2' },
+
+    "electronics-vista.ru"  : {  host     : 'adminv50.beget.tech',
+                                user     : 'adminv50_db24',
+                                password : 'W4wxb9WqZ5XD',
+                                database : 'adminv50_db24' },
 
 
 
